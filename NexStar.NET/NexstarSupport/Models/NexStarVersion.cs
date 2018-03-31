@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using NexStar.NET.Exceptions;
+using NexStar.Net.Exceptions;
 
-namespace NexStar.NET.NexstarSupport.Models
+namespace NexStar.Net.NexstarSupport.Models
 {
     public class NexStarVersion
     {

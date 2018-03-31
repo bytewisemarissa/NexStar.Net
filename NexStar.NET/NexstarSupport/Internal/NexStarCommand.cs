@@ -1,13 +1,16 @@
 ﻿using System;
 
-namespace NexStar.NET.NexstarSupport.BaseCommandClasses
+namespace NexStar.Net.NexstarSupport.BaseCommandClasses
 {
-    public abstract class NexStarCommand
+    public abstract class NexStarCommand<T>
     {
-        public byte[] RawResultBytes;
-
-        public Exception CommandException;
+        public abstract T TypedResult { get; }
         
         public abstract byte[] RenderCommandBytes();
+
+        public byte[] RawResultBytes { get; set; }
+
+        public Exception CommandException { get; set; }
+        
     }
 }

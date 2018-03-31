@@ -18,9 +18,9 @@ namespace NexStarEmulator.Tests
 
             Assert.AreEqual(testResult.Length, 3);
 
-            Assert.AreEqual(testResult[0], 0x05);
-            Assert.AreEqual(testResult[1], 0x16);
-            Assert.AreEqual(testResult[2], 0x23);
+            Assert.AreEqual(0x05, testResult[0]);
+            Assert.AreEqual(0x16, testResult[1]);
+            Assert.AreEqual(0x23, testResult[2]);
         }
 
         [TestMethod]
@@ -34,8 +34,8 @@ namespace NexStarEmulator.Tests
 
             Assert.AreEqual(testResult.Length, 2);
 
-            Assert.AreEqual(testResult[0], 0x01);
-            Assert.AreEqual(testResult[1], 0x23);
+            Assert.AreEqual(0x01, testResult[0]);
+            Assert.AreEqual(0x23, testResult[1]);
 
             // TODO: Verify hang behavior on real telescope - 0
             //common fuck up one
@@ -44,8 +44,8 @@ namespace NexStarEmulator.Tests
 
             Assert.AreEqual(testResult.Length, 2);
 
-            Assert.AreEqual(testResult[0], 0x01);
-            Assert.AreEqual(testResult[1], 0x23);
+            Assert.AreEqual(0x01, testResult[0]);
+            Assert.AreEqual(0x23, testResult[1]);
 
             Assert.AreEqual(testProcessor.IsSimulationHung(), true);
             Assert.AreEqual(testProcessor.IsHangPreReturn(), false);
@@ -58,8 +58,7 @@ namespace NexStarEmulator.Tests
 
             testResult = testProcessor.ProcessRequestBytes(testRequestBytes);
 
-            Assert.AreEqual(testProcessor.IsSimulationHung(), true);
-            Assert.AreEqual(testProcessor.IsHangPreReturn(), true);
+            Assert.AreEqual(testProcessor.IsPaused(), true);
         }
 
         [TestMethod]
@@ -72,8 +71,8 @@ namespace NexStarEmulator.Tests
 
             Assert.AreEqual(testResult.Length, 2);
 
-            Assert.AreEqual(testResult[0], 0x0F);
-            Assert.AreEqual(testResult[1], 0x23);
+            Assert.AreEqual(0x0F, testResult[0]);
+            Assert.AreEqual(0x23, testResult[1]);
         }
 
         [TestMethod]
@@ -86,8 +85,18 @@ namespace NexStarEmulator.Tests
 
             Assert.AreEqual(testResult.Length, 2);
 
-            Assert.AreEqual(testResult[0], 0x00);
-            Assert.AreEqual(testResult[1], 0x23);
+            Assert.AreEqual(0x00, testResult[0]);
+            Assert.AreEqual(0x23, testResult[1]);
+
+            testProcessor.SetAligning(true);
+
+            testRequestBytes = new byte[] { 0x4A };
+            testResult = testProcessor.ProcessRequestBytes(testRequestBytes);
+
+            Assert.AreEqual(testResult.Length, 2);
+
+            Assert.AreEqual(0x01, testResult[0]);
+            Assert.AreEqual(0x23, testResult[1]);
         }
 
         [TestMethod]
@@ -101,21 +110,51 @@ namespace NexStarEmulator.Tests
             Assert.AreEqual(testResult.Length, 2);
 
             // TODO: Reverify this result seeing mixed results in the test utility but it might be slewing not stoping correctly
-            Assert.AreEqual(testResult[0], 0x00);
-            Assert.AreEqual(testResult[1], 0x23);
+            Assert.AreEqual(0x00, testResult[0]);
+            Assert.AreEqual(0x23, testResult[1]);
+
+            testProcessor.SetGoto(true);
+
+            testRequestBytes = new byte[] { 0x4C };
+            testResult = testProcessor.ProcessRequestBytes(testRequestBytes);
+
+            Assert.AreEqual(2, testResult.Length);
+
+            // TODO: Reverify this result seeing mixed results in the test utility but it might be slewing not stoping correctly
+            Assert.AreEqual(0x01, testResult[0]);
+            Assert.AreEqual(0x23, testResult[1]);
         }
 
         [TestMethod]
         public void Processor114LCM_CancelGotoTest()
         {
             RequestProcessor_114LCM testProcessor = new RequestProcessor_114LCM();
+            testProcessor.SetGoto(true);
 
-            byte[] testRequestBytes = new byte[] { 0x4D };
+            byte[] testRequestBytes = new byte[] { 0x4C };
             byte[] testResult = testProcessor.ProcessRequestBytes(testRequestBytes);
+
+            Assert.AreEqual(testResult.Length, 2);
+
+            // TODO: Reverify this result seeing mixed results in the test utility but it might be slewing not stoping correctly
+            Assert.AreEqual(0x01, testResult[0]);
+            Assert.AreEqual(0x23, testResult[1]);
+
+            testRequestBytes = new byte[] { 0x4D };
+            testResult = testProcessor.ProcessRequestBytes(testRequestBytes);
 
             Assert.AreEqual(testResult.Length, 1);
             
-            Assert.AreEqual(testResult[1], 0x23);
+            Assert.AreEqual(0x23, testResult[0]);
+
+            testRequestBytes = new byte[] { 0x4C };
+            testResult = testProcessor.ProcessRequestBytes(testRequestBytes);
+
+            Assert.AreEqual(testResult.Length, 2);
+
+            // TODO: Reverify this result seeing mixed results in the test utility but it might be slewing not stoping correctly
+            Assert.AreEqual(0x00, testResult[0]);
+            Assert.AreEqual(0x23, testResult[1]);
         }
 
         [TestMethod]
@@ -128,9 +167,9 @@ namespace NexStarEmulator.Tests
 
             Assert.AreEqual(testResult.Length, 3);
 
-            Assert.AreEqual(testResult[0], 0x06);
-            Assert.AreEqual(testResult[1], 0x0D);
-            Assert.AreEqual(testResult[2], 0x23);
+            Assert.AreEqual(0x06, testResult[0]);
+            Assert.AreEqual(0x0D, testResult[1]);
+            Assert.AreEqual(0x23, testResult[2]);
         }
 
         [TestMethod]

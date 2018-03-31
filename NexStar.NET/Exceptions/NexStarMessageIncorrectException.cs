@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NexStar.NET.Exceptions
+namespace NexStar.Net.Exceptions
 {
     public class NexStarMessageIncorrectException : Exception
     {

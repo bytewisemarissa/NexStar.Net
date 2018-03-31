@@ -5,31 +5,32 @@ using System.IO.Ports;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using NexStar.NET.NexstarSupport.Commands;
-using NexStar.NET.NexstarSupport.BaseCommandClasses;
-using NexStar.NET.Settings;
+using NexStar.Net.NexstarSupport.BaseCommandClasses;
+using NexStar.Net.Settings;
+using NexStar.Net.NexstarSupport.Commands;
 
-namespace NexStar.NET.SerialMgmt
+namespace NexStar.Net.SerialMgmt
 {
     public class SerialPortController
     {
-        private SerialPort _managedPort;
+        private readonly SerialPort _managedPort;
         private readonly object _syncLock;
-        private static readonly string StopCharacter = "#";
+        private readonly string _stopCharacter;
+
         public SerialPortController(string portToManage)
         {
             _syncLock = new object();
 
             _managedPort = BuildNexStarSerialPort();
             _managedPort.PortName = portToManage;
+            _stopCharacter = "#";
         }
 
-        public NexStarCommand RunCommand(NexStarCommand command, int retryCount = 0)
+        public NexStarCommand<T> RunCommand<T>(NexStarCommand<T> command, int retryCount = 0)
         {
             if (command == null)
             {
-                command.RawResultBytes = null;
-                return command;
+                throw new NullReferenceException("Command parameter can not be null.");
             }
 
             byte[] commandBytes = command.RenderCommandBytes();
@@ -45,7 +46,7 @@ namespace NexStar.NET.SerialMgmt
                     }
 
                     _managedPort.Write(commandBytes, 0, commandBytes.Count());
-                    command.RawResultBytes = Encoding.UTF8.GetBytes(_managedPort.ReadTo(StopCharacter));
+                    command.RawResultBytes = Encoding.UTF8.GetBytes(_managedPort.ReadTo(_stopCharacter));
                     return command;
                 }
                 catch (TimeoutException ex)
@@ -77,7 +78,7 @@ namespace NexStar.NET.SerialMgmt
             }
         }
 
-        public static SerialPort BuildNexStarSerialPort()
+        private static SerialPort BuildNexStarSerialPort()
         {
             SerialPort returnValue = new SerialPort()
             {

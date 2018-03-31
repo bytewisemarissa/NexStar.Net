@@ -8,9 +8,12 @@ namespace NexStarEmulator.Processors
 {
     public class RequestProcessor_114LCM : IProcessor
     {
-        public bool _isSimulationHung = false;
-        public bool _isHangPreReturn = false;
-        public bool _isPaused = false;
+        private bool _isSimulationHung = false;
+        private bool _isHangPreReturn = false;
+        private bool _isPaused = false;
+
+        private bool _isAligning = false;
+        private bool _isGoto = false;
 
         public byte[] ProcessRequestBytes(byte[] incomingBytes)
         {
@@ -42,6 +45,16 @@ namespace NexStarEmulator.Processors
             return _isPaused;
         }
 
+        public void SetAligning(bool value)
+        {
+            _isAligning = value;
+        }
+
+        public void SetGoto(bool value)
+        {
+            _isGoto = value;
+        }
+
         private byte[] ResolveCommand(byte[] incomingBytes)
         {
             if (incomingBytes == null || incomingBytes.Length == 0)
@@ -53,13 +66,79 @@ namespace NexStarEmulator.Processors
             {
                 switch (incomingBytes[i])
                 {
-                    case 0x56: // 'V' Version Command
+                    case 0x56: 
                         return VersionCommand(incomingBytes);
+                    case 0x4B: 
+                        return EchoCommand(incomingBytes);
+                    case 0x6D: 
+                        return ModelCommand(incomingBytes);
+                    case 0x4A:
+                        return CheckAligmentCommand(incomingBytes);
+                    case 0x4C:
+                        return CheckGotoRunningCommand(incomingBytes);
+                    case 0x4D:
+                        return CancelGotoCommand(incomingBytes);
                 }
             }
 
             _isPaused = true;
             return null;
+        }
+
+        private byte[] CancelGotoCommand(byte[] incomingBytes)
+        {
+            if (_isGoto)
+            {
+                _isGoto = false;
+            }
+
+            return new byte[0];
+        }
+
+        private byte[] CheckGotoRunningCommand(byte[] incomingBytes)
+        {
+            if (_isGoto)
+            {
+                return new byte[] { 0x01 };
+            }
+            else
+            {
+                return new byte[] { 0x00 };
+            }
+        }
+
+        private byte[] CheckAligmentCommand(byte[] incomingBytes)
+        {
+            if (_isAligning)
+            {
+                return new byte[] { 0x01 };
+            }
+            else
+            {
+                return new byte[] { 0x00 };
+            }
+        }
+
+        private byte[] ModelCommand(byte[] incomingBytes)
+        {
+            return new byte[] {0x0F};
+        }
+
+        private byte[] EchoCommand(byte[] incomingBytes)
+        {
+            if (incomingBytes.Length == 1)
+            {
+                _isPaused = true;
+                return null;
+            }
+
+            if (incomingBytes.Length > 2)
+            {
+                _isSimulationHung = true;
+                _isHangPreReturn = false;
+            }
+
+            return new byte[] { incomingBytes[1] };
         }
 
         private byte[] VersionCommand(byte[] incomingBytes)
