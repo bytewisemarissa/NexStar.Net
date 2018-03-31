@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NexStar.Net.NexstarSupport.BaseCommandClasses
+namespace NexStar.Net.NexstarSupport.Internal
 {
     public abstract class NexStarCommand<T>
     {
@@ -8,9 +8,20 @@ namespace NexStar.Net.NexstarSupport.BaseCommandClasses
         
         public abstract byte[] RenderCommandBytes();
 
-        public byte[] RawResultBytes { get; set; }
+        private byte[] _rawResultBytes;
+        public byte[] RawResultBytes
+        {
+            get
+            {
+                if (_rawResultBytes == null)
+                {
+                    throw new NullReferenceException("RawResultBytes is null when it was expected to be populated.");
+                }
 
-        public Exception CommandException { get; set; }
-        
+                return _rawResultBytes;
+            }
+
+            set => _rawResultBytes = value;
+        }
     }
 }

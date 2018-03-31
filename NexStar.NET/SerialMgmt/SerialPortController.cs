@@ -5,9 +5,9 @@ using System.IO.Ports;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using NexStar.Net.NexstarSupport.BaseCommandClasses;
 using NexStar.Net.Settings;
 using NexStar.Net.NexstarSupport.Commands;
+using NexStar.Net.NexstarSupport.Internal;
 
 namespace NexStar.Net.SerialMgmt
 {
@@ -49,20 +49,14 @@ namespace NexStar.Net.SerialMgmt
                     command.RawResultBytes = Encoding.UTF8.GetBytes(_managedPort.ReadTo(_stopCharacter));
                     return command;
                 }
-                catch (TimeoutException ex)
+                catch (TimeoutException)
                 {
                     if (NexStarSettingsManager.IsRetryEnabled && retryCount < NexStarSettingsManager.MaxRetryCount)
                     {
                         return RunCommand(command, retryCount + 1);
                     }
 
-                    command.CommandException = ex;
-                    return command;
-                }
-                catch (UnauthorizedAccessException ex)
-                {
-                    command.CommandException = ex;
-                    return command;
+                    throw;
                 }
             }
         }

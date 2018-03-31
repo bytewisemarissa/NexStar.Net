@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NexStar.Net.Enums;
-using NexStar.Net.NexstarSupport.BaseCommandClasses;
+using NexStar.Net.NexstarSupport.Internal;
 using NexStar.Net.NexstarSupport.Models;
 
 namespace NexStar.Net.NexstarSupport.Commands
@@ -18,18 +18,7 @@ namespace NexStar.Net.NexstarSupport.Commands
             _targetDevice = targetDevice;
         }
 
-        public override NexStarVersion TypedResult
-        {
-            get
-            {
-                if (base.RawResultBytes == null)
-                {
-                    return null;
-                }
-
-                return new NexStarVersion(base.RawResultBytes);
-            }
-        }
+        public override NexStarVersion TypedResult => new NexStarVersion(base.RawResultBytes);
 
         public override byte[] RenderCommandBytes()
         {

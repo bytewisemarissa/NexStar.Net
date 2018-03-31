@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using NexStar.Net.NexstarSupport.BaseCommandClasses;
 using NexStar.Net.Enums;
+using NexStar.Net.NexstarSupport.Internal;
 
 namespace NexStar.Net.NexstarSupport.Commands
 {

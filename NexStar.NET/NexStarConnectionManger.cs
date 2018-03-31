@@ -7,20 +7,36 @@ using System.Threading.Tasks;
 using NexStar.Net.NexstarSupport.Commands;
 using NexStar.Net.SerialMgmt;
 using NexStar.Net.Exceptions;
-using NexStar.Net.NexstarSupport.BaseCommandClasses;
 
 namespace NexStar.Net
 {
     public class NexStarConnectionManager
     {
-        public NexStarConnection CreateConnectionForAddress(string serialComAddress)
+        public readonly List<string> ActiveNexStarDevicePortNames;
+        public readonly Dictionary<Guid, NexStarConnection> Connections;
+
+        public NexStarConnectionManager()
         {
-            return new NexStarConnection(serialComAddress);
+            ActiveNexStarDevicePortNames = new List<string>();
+            Connections = new Dictionary<Guid, NexStarConnection>();
+        }
+
+        public Guid CreateConnectionForAddress(string serialComAddress)
+        {
+            if (!ActiveNexStarDevicePortNames.Contains(serialComAddress))
+            {
+                throw new ArgumentException("The port address identified is not a nexstar device. Ensure that you have run RefreshActiveSerialNexstarDevices() before starting a connection.");
+            }
+
+            var identifier = Guid.NewGuid();
+            Connections.Add(identifier, new NexStarConnection(serialComAddress));
+            return identifier;
         }
         
-        public string[] FindActiveSerialNexstarDevices()
+        public void RefreshActiveSerialNexstarDevices()
         {
-            List<string> livePorts = new List<string>();
+            ActiveNexStarDevicePortNames.Clear();
+
             string[] portNames = SerialPort.GetPortNames();
             foreach (string portName in portNames)
             {
@@ -31,11 +47,9 @@ namespace NexStar.Net
 
                 if (versionCommandCommand.RawResultBytes != null)
                 {
-                    livePorts.Add(portName);
+                    ActiveNexStarDevicePortNames.Add(portName);
                 }
             }
-
-            return livePorts.ToArray();
         }
     }
 }
